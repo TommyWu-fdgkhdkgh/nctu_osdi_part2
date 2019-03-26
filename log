@@ -1,0 +1,27 @@
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -c -o boot/boot.o boot/boot.S
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o boot/main.o boot/main.c
++ ld boot/boot
+ld  -N -e start -Ttext 0x7C00 -o boot/boot.out boot/boot.o boot/main.o
+objdump -S boot/boot.out >boot/boot.asm
+objcopy -S -O binary -j .text boot/boot.out boot/boot
+perl boot/sign.pl ./boot/boot
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -c -o kernel/entry.o kernel/entry.S
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/main.o kernel/main.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/picirq.o kernel/picirq.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/kbd.o kernel/kbd.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/screen.o kernel/screen.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/trap.o kernel/trap.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -c -o kernel/trap_entry.o kernel/trap_entry.S
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/printf.o kernel/printf.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/shell.o kernel/shell.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I. -Os -c -o kernel/timer.o kernel/timer.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I.   -c -o lib/printfmt.o lib/printfmt.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I.   -c -o lib/readline.o lib/readline.c
+gcc -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin  -g -I.   -c -o lib/string.o lib/string.c
++ ld kernel/system
+ld -T kernel/kern.ld kernel/entry.o kernel/main.o kernel/picirq.o kernel/kbd.o kernel/screen.o kernel/trap.o kernel/trap_entry.o kernel/printf.o kernel/shell.o kernel/timer.o lib/printfmt.o lib/readline.o lib/string.o /usr/lib/gcc/i686-redhat-linux/4.5.1/libgcc.a -o kernel/system
+objdump -S kernel/system > kernel/system.asm
+nm -n kernel/system > kernel/system.sym
+dd if=/dev/zero of=./kernel.img count=10000 2>/dev/null
+dd if=./boot/boot of=./kernel.img conv=notrunc 2>/dev/null
+dd if=./kernel/system of=./kernel.img seek=1 conv=notrunc 2>/dev/null

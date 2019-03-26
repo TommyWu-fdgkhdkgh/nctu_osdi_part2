@@ -33,6 +33,7 @@ void timer_init()
 	set_timer(TIME_HZ);
 
 	/* Enable interrupt */
+        //IRQ_TIMER = 0
 	irq_setmask_8259A(irq_mask_8259A & ~(1<<IRQ_TIMER));
 }
 

@@ -28,3 +28,15 @@ clean:
 	rm $(OBJDIR)/boot/*.o $(OBJDIR)/boot/boot.out $(OBJDIR)/boot/boot $(OBJDIR)/boot/boot.asm
 	rm $(OBJDIR)/kernel/*.o $(OBJDIR)/kernel/system* kernel.*
 	rm $(OBJDIR)/lib/*.o
+
+start:
+	@qemu-system-i386 -hda kernel.img
+
+debug:
+	@qemu-system-i386 -hda kernel.img -s -S -serial stdio
+
+
+
+
+
+

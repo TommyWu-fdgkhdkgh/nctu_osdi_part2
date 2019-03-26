@@ -1,0 +1,5 @@
+編譯的時候一定要 make all，我猜是因為include其他Makefile的原因，所以變成第一條規則不是all
+
+
+
+可以試試看做出一個像是lab1的debug tool，不然沒辦法debug的情況下，要開發這個東西未免也太痛苦了

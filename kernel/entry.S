@@ -10,6 +10,7 @@ _start:
 	movl $0, %ebp
 	movl $(bootstacktop), %esp
 
+
 	call kernel_main
 die:
 	jmp die

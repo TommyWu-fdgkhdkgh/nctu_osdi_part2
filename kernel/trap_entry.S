@@ -22,6 +22,12 @@
  *       The Trap number are declared in inc/trap.h which might come in handy
  *       when declaring interface for ISRs.
  */
+	#第一個參數意思應該是function名稱
+	#第二個參數意思應該是....
+	TRAPHANDLER_NOEC(timer, 0x20) 
+	TRAPHANDLER_NOEC(keyboard, 0x21) 
+
+
 
 .globl default_trap_handler;
 _alltraps:
@@ -33,13 +39,22 @@ _alltraps:
    *       occurs. Thus, you do not have to push those registers.
    *       Please reference lab3.docx for what registers are pushed by
    *       CPU.
-   *       You may want to leverage the "pusha" instructions to reduce your work of
-   *       pushing all the general purpose registers into the stack.
-	 */
+   */
 
+	push %ds
+	push %es
+	push %eax
+	push %ecx
+	push %edx
+	push %ebx
+	push $0  #useless
+	push %ebp
+	push %esi
+	push %edi
 	pushl %esp # Pass a pointer which points to the Trapframe as an argument to default_trap_handler()
 	call default_trap_handler
 
 	add $8, %esp # Cleans up the pushed error code and pushed ISR number
+	add $0x2c, %esp #0x4*11
 	iret # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
 

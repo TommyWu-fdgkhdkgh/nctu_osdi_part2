@@ -8,6 +8,12 @@
  */
 static struct Trapframe *last_tf;
 
+struct Gatedesc idt[256];
+struct Pseudodesc idt_pd;
+extern void timer();
+extern void keyboard();
+extern void timer_handler();
+
 /* TODO: You should declare an interrupt descriptor table.
  *       In x86, there are at most 256 it.
  *
@@ -103,22 +109,32 @@ print_regs(struct PushRegs *regs)
 static void
 trap_dispatch(struct Trapframe *tf)
 {
-  /* TODO: Handle specific interrupts.
-   *       You need to check the interrupt number in order to tell
-   *       which interrupt is currently happening since every interrupt
-   *       comes to this function called by default_trap_handler.
-   *
-   * NOTE: Checkout the Trapframe data structure for interrupt number,
-   *       which we had pushed into the stack when going through the
-   *       declared interface in trap_entry.S
-   *
-   *       The interrupt number is defined in inc/trap.h
-   *
-   *       We prepared the keyboard handler and timer handler for you
-   *       already. Please reference in kernel/kbd.c and kernel/timer.c
-   */
+	/* TODO: Handle specific interrupts.
+   	 *       You need to check the interrupt number in order to tell
+  	 *       which interrupt is currently happening since every interrupt
+  	 *       comes to this function called by default_trap_handler.
+  	 *
+  	 * NOTE: Checkout the Trapframe data structure for interrupt number,
+  	 *       which we had pushed into the stack when going through the
+ 	 *       declared interface in trap_entry.S
+  	 *
+  	 *       The interrupt number is defined in inc/trap.h
+  	 *
+   	 *       We prepared the keyboard handler and timer handler for you
+   	 *       already. Please reference in kernel/kbd.c and kernel/timer.c
+   	 */
+	if(tf->tf_trapno==IRQ_OFFSET+IRQ_TIMER){
+		//cprintf("timer!\n");
+		timer_handler();
+		//for(;;);
+		return;
+	}else if(tf->tf_trapno==IRQ_OFFSET+IRQ_KBD){
+		cprintf("--------------keyboard!-------------\n");
+		return;
+		//for(;;);
+	}
 
-	// Unexpected trap: The user process or the kernel has a bug.
+	// Unexpected trap: The user process or the kernel has a bug.	
 	print_trapframe(tf);
 }
 
@@ -133,6 +149,7 @@ void default_trap_handler(struct Trapframe *tf)
 
 	// Dispatch based on what type of trap occurred
 	trap_dispatch(tf);
+
 }
 
 
@@ -159,9 +176,18 @@ void trap_init()
    *       There is a data structure called Pseudodesc in mmu.h which might
    *       come in handy for you when filling up the argument of "lidt"
    */
+   //SETGATE(gate, istrap, sel, off, dpl)
+   //SETGATE()
+  cprintf("hihi\n");
 
-	/* Keyboard interrupt setup */
-	/* Timer Trap setup */
+  /* Keyboard interrupt setup */
+  SETGATE(idt[0x21], 0,  0x8, keyboard, 0);
+  /* Timer Trap setup */
+  SETGATE(idt[0x20], 0,  0x8, timer, 0);
   /* Load IDT */
+  idt_pd.pd_lim = 256*8-1;
+  idt_pd.pd_base= idt;
+
+  lidt(&idt_pd);
 
 }

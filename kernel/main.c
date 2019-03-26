@@ -9,14 +9,21 @@
 extern void init_video(void);
 void kernel_main(void)
 {
+
+
+
+
 	init_video();
 
 	pic_init();
-  /* TODO: You should uncomment them
-   */
-	// kbd_init();
-	// timer_init();
-	// trap_init();
+	/* TODO: You should uncomment them
+	*/
+
+	kbd_init();
+	timer_init();
+	trap_init();
+
+	//enable interrupt之後，就開始怪怪的
 
 	/* Enable interrupt */
 	__asm __volatile("sti");

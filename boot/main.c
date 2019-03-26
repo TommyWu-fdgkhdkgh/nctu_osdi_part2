@@ -35,9 +35,11 @@
 void readsect(void*, uint32_t);
 void readseg(uint32_t, uint32_t, uint32_t);
 
+//read the kernel and jump to it
 void
 bootmain(void)
 {
+
 	struct Proghdr *ph, *eph;
 
 	// read 1st page off disk
@@ -57,6 +59,8 @@ bootmain(void)
 
 	// call the entry point from the ELF header
 	// note: does not return!
+	 
+	
 	((void (*)(void)) (ELFHDR->e_entry))();
 
 bad:
@@ -68,6 +72,7 @@ bad:
 
 // Read 'count' bytes at 'offset' from kernel into physical address 'pa'.
 // Might copy more than asked
+// 
 void
 readseg(uint32_t pa, uint32_t count, uint32_t offset)
 {
