@@ -32,6 +32,9 @@ clean:
 start:
 	@qemu-system-i386 -hda kernel.img
 
+en:
+	@qemu-system-i386 -hda kernel.img -k en-us
+
 debug:
 	@qemu-system-i386 -hda kernel.img -s -S -serial stdio
 

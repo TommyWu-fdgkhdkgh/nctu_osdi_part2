@@ -622,8 +622,8 @@ void scroll(void)
     unsigned short temp;
 
     /* The equation for finding the index in a linear
-    *  chunk of memory can be represented by:
-    *  Index = [(y * width) + x] */
+     *  chunk of memory can be represented by:
+     *  Index = [(y * width) + x] */
     temp = csr_y * 80 + csr_x;
   1002ec:	66 6b 0d 34 b5 10 00 	imul   $0x50,0x10b534,%cx
   1002f3:	50 

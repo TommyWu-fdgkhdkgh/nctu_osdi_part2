@@ -40,8 +40,8 @@ void move_csr(void)
     unsigned short temp;
 
     /* The equation for finding the index in a linear
-    *  chunk of memory can be represented by:
-    *  Index = [(y * width) + x] */
+     *  chunk of memory can be represented by:
+     *  Index = [(y * width) + x] */
     temp = csr_y * 80 + csr_x;
 
     /* This sends a command to indicies 14 and 15 in the
