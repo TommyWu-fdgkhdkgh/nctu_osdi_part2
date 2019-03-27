@@ -9,7 +9,7 @@ NM = nm
 CFLAGS = -m32 -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin 
 
 # Add debug symbol
-CFLAGS += -g
+CFLAGS += -g -O0
 
 CFLAGS += -I.
 

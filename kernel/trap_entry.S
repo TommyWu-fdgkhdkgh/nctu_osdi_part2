@@ -41,20 +41,33 @@ _alltraps:
    *       CPU.
    */
 
-	push %ds
-	push %es
-	push %eax
-	push %ecx
-	push %edx
-	push %ebx
-	push $0  #useless
-	push %ebp
-	push %esi
-	push %edi
+	pushl %ds
+	pushl %es
+	pushl %eax
+	pushl %ecx
+	pushl %edx
+	pushl %ebx
+	pushl $0  #useless
+	pushl %ebp
+	pushl %esi
+	pushl %edi
+
 	pushl %esp # Pass a pointer which points to the Trapframe as an argument to default_trap_handler()
 	call default_trap_handler
 
+	
+	pop %esp
+	pop %edi
+	pop %esi
+	pop %ebp
+	pop %eax #useless
+	pop %ebx
+	pop %edx
+	pop %ecx
+	pop %eax
+	pop %es
+	pop %ds
 	add $8, %esp # Cleans up the pushed error code and pushed ISR number
-	add $0x2c, %esp #0x4*11
+	#add $0x28, %esp #0x4*11
 	iret # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP!
 

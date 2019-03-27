@@ -1,5 +1,5 @@
 /* Modify from MIT 6.828 course resource
-*  Reference: http://pdos.csail.mit.edu/6.828/2012/
+ *  Reference: http://pdos.csail.mit.edu/6.828/2012/
 */
 
 #include <inc/kbd.h>
@@ -173,6 +173,7 @@ static struct {
 
 // called by device interrupt routines to feed input characters
 // into the circular console input buffer.
+// 我猜是有新的輸入就放進來
 static void
 cons_intr(int (*proc)(void))
 {
@@ -182,12 +183,14 @@ cons_intr(int (*proc)(void))
 		if (c == 0)
 			continue;
 		cons.buf[cons.wpos++] = c;
+		//cprintf("\ninput:%d\n",c);
 		if (cons.wpos == CONSBUFSIZE)
 			cons.wpos = 0;
 	}
 }
 
 // return the next input character from the console, or 0 if none waiting
+// 有東西能輸出就輸出，沒東西輸出就return 0
 int
 cons_getc(void)
 {
@@ -198,8 +201,10 @@ cons_getc(void)
 	// (e.g., when called from the kernel monitor).
 	//kbd_intr();
 
+        //cprintf("cons_getc cons.rpos:%d  cons.wpos:%d\n",cons.rpos,cons.wpos);
 	// grab the next character from the input buffer.
 	if (cons.rpos != cons.wpos) {
+		//cprintf("\n\ncons_getc return 0\n\n");
 		c = cons.buf[cons.rpos++];
 		if (cons.rpos == CONSBUFSIZE)
 			cons.rpos = 0;
@@ -215,6 +220,8 @@ void
 kbd_intr(void)
 {
 	cons_intr(kbd_proc_data);
+
+        //cprintf("cons.rpos:%d  cons.wpos:%d\n",cons.rpos,cons.wpos);
 }
 
 void kbd_init(void)
@@ -230,9 +237,22 @@ void kbd_init(void)
 /* high-level console I/O */
 int getc(void)
 {
-	int c;
+	int c=0;
+        int i=0;
+	/*while ((c = cons_getc()) == 0 || c>1000000){
+		/*i++;
+		if(i%10000==0){
+			cprintf("g");
+		}*/
+		//cprintf("g");
+		/* do nothing */
+	        //for(;;);
+	//}
+	do{
+		c=cons_getc();
+	}while(c==0 /*|| c>1000000 || c==-1*/);	
 
-	while ((c = cons_getc()) == 0)
-		/* do nothing */;
+
+	//cprintf("\n\ngetc : %d\n\n",c);
 	return c;
 }

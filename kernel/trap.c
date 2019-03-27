@@ -12,7 +12,9 @@ struct Gatedesc idt[256];
 struct Pseudodesc idt_pd;
 extern void timer();
 extern void keyboard();
-extern void timer_handler();
+extern void timer_hanler();
+extern void kbd_intr();
+//extern void timer_handler();
 
 /* TODO: You should declare an interrupt descriptor table.
  *       In x86, there are at most 256 it.
@@ -126,12 +128,17 @@ trap_dispatch(struct Trapframe *tf)
 	if(tf->tf_trapno==IRQ_OFFSET+IRQ_TIMER){
 		//cprintf("timer!\n");
 		timer_handler();
+		//print_trapframe(tf);
 		//for(;;);
 		return;
 	}else if(tf->tf_trapno==IRQ_OFFSET+IRQ_KBD){
-		cprintf("--------------keyboard!-------------\n");
-		return;
+		//cprintf("--------------keyboard!-------------\n");
+		//print_trapframe(tf);
+		kbd_intr();
+		//kbd_init();
+		//cprintf("%c\n",cons_getc());
 		//for(;;);
+		return;
 	}
 
 	// Unexpected trap: The user process or the kernel has a bug.	
@@ -178,12 +185,10 @@ void trap_init()
    */
    //SETGATE(gate, istrap, sel, off, dpl)
    //SETGATE()
-  cprintf("hihi\n");
-
   /* Keyboard interrupt setup */
-  SETGATE(idt[0x21], 0,  0x8, keyboard, 0);
+  SETGATE(idt[0x21], 0,  0x8, keyboard, 3);
   /* Timer Trap setup */
-  SETGATE(idt[0x20], 0,  0x8, timer, 0);
+  SETGATE(idt[0x20], 0,  0x8, timer, 3);
   /* Load IDT */
   idt_pd.pd_lim = 256*8-1;
   idt_pd.pd_base= idt;

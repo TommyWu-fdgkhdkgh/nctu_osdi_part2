@@ -3,6 +3,12 @@
 #include <inc/shell.h>
 #include <inc/timer.h>
 
+extern char *kernel_load_addr;
+extern char *etext;//or use *etext
+extern char *beforedata;
+extern char *afterdata;
+extern char *end;
+
 struct Command {
 	const char *name;
 	const char *desc;
@@ -13,7 +19,8 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
-	{ "print_tick", "Display system tick", print_tick }
+	{ "print_tick", "Display system tick", print_tick },
+	{ "chgcolor", "the screen changes the text color.", chgcolor}
 };
 #define NCOMMANDS (sizeof(commands)/sizeof(commands[0]))
 
@@ -29,17 +36,31 @@ int mon_help(int argc, char **argv)
 
 int mon_kerninfo(int argc, char **argv)
 {
-  /* TODO: Print the kernel code and data section size 
-   * NOTE: You can count only linker script (kernel/kern.ld) to
-   *       provide you with those information.
-   *       Use PROVIDE inside linker script and calculate the
-   *       offset.
-   */
+	/* TODO: Print the kernel code and data section size 
+ 	* NOTE: You can count only linker script (kernel/kern.ld) to
+ 	*       provide you with those information.
+	*       Use PROVIDE inside linker script and calculate the
+	*       offset.
+	*/
+	cprintf("kernel code base start=%p size = %d\n",&kernel_load_addr,(int)&etext-(int)&kernel_load_addr);
+	cprintf("kernel data base start=%p size = %d\n",&beforedata,(int)&afterdata-(int)&beforedata);
+	cprintf("kernel executable memory footprint: %dKB\n",((int)&end-(int)&kernel_load_addr)/1024);
 	return 0;
 }
 int print_tick(int argc, char **argv)
 {
 	cprintf("Now tick = %d\n", get_tick());
+}
+
+int chgcolor(int argc, char **argv)
+{
+	if(argc==1){
+		cprintf("No input text color!\n");
+	}else{
+		//int color = ;
+		settextcolor(argv[1][0]-'0',0);
+		cprintf("Change color %d!\n",argv[1][0]-'0');
+	}
 }
 
 #define WHITESPACE "\t\r\n "
